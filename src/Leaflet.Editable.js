@@ -7,13 +7,13 @@
         define(['leaflet'], factory);
 
 
-    // define a Common JS module that relies on 'leaflet'
+        // define a Common JS module that relies on 'leaflet'
     } else if (typeof exports === 'object') {
         module.exports = factory(require('leaflet'));
     }
 
     // attach your plugin to the global 'L' variable
-    if(typeof window !== 'undefined' && window.L){
+    if (typeof window !== 'undefined' && window.L) {
         factory(window.L);
     }
 
@@ -145,7 +145,7 @@
         },
 
         createLineGuide: function () {
-            var options = L.extend({dashArray: '5,10', weight: 1, interactive: false}, this.options.lineGuideOptions);
+            var options = L.extend({ dashArray: '5,10', weight: 1, interactive: false }, this.options.lineGuideOptions);
             return L.polyline([], options);
         },
 
@@ -330,7 +330,7 @@
         // 🍂method startRectangle(latlng: L.LatLng, options: hash): L.Rectangle
         // Start drawing a Rectangle. If `latlng` is given, the Rectangle anchor will be added. In any case, continuing on user drag.
         // If `options` is given, it will be passed to the Rectangle class constructor.
-        startRectangle: function(latlng, options) {
+        startRectangle: function (latlng, options) {
             var corner = latlng || L.latLng([0, 0]);
             var bounds = new L.LatLngBounds(corner, corner);
             var rectangle = this.createRectangle(bounds, options);
@@ -353,12 +353,12 @@
         },
 
         createLayer: function (klass, latlngs, options) {
-            options = L.Util.extend({editOptions: {editTools: this}}, options);
+            options = L.Util.extend({ editOptions: { editTools: this } }, options);
             var layer = new klass(latlngs, options);
             // 🍂namespace Editable
             // 🍂event editable:created: LayerEvent
             // Fired when a new feature (Marker, Polyline…) is created.
-            this.fireAndForward('editable:created', {layer: layer});
+            this.fireAndForward('editable:created', { layer: layer });
             return layer;
         },
 
@@ -473,7 +473,7 @@
             this.latlngs = latlngs;
             this.editor = editor;
             L.Marker.prototype.initialize.call(this, latlng, options);
-            this.options.icon = this.editor.tools.createVertexIcon({className: this.options.className});
+            this.options.icon = this.editor.tools.createVertexIcon({ className: this.options.className });
             this.latlng.__vertex = this;
             this.editor.editLayer.addLayer(this);
             this.setZIndexOffset(editor.tools._lastZIndex + 1);
@@ -568,7 +568,7 @@
             var next = this.getNext();  // Compute before changing latlng
             this.latlngs.splice(this.getIndex(), 1);
             this.editor.editLayer.removeLayer(this);
-            this.editor.onVertexDeleted({latlng: this.latlng, vertex: this});
+            this.editor.onVertexDeleted({ latlng: this.latlng, vertex: this });
             if (!this.latlngs.length) this.editor.deleteShape(this.latlngs);
             if (next) next.resetMiddleMarker();
             this.editor.refresh();
@@ -669,7 +669,7 @@
             this.latlngs = latlngs;
             L.Marker.prototype.initialize.call(this, this.computeLatLng(), options);
             this._opacity = this.options.opacity;
-            this.options.icon = this.editor.tools.createVertexIcon({className: this.options.className});
+            this.options.icon = this.editor.tools.createVertexIcon({ className: this.options.className });
             this.editor.editLayer.addLayer(this);
             this.setVisibility();
         },
@@ -733,10 +733,14 @@
             var marker = this.editor.addVertexMarker(e.latlng, this.latlngs);
             this.editor.onNewVertex(marker);
             /* Hack to workaround browser not firing touchend when element is no more on DOM */
-            var parent = marker._icon.parentNode;
-            parent.removeChild(marker._icon);
-            marker._icon = icon;
-            parent.appendChild(marker._icon);
+            if (marker._icon) {
+                var parent = marker._icon.parentNode;
+                if (parent) {
+                    parent.removeChild(marker._icon);
+                    marker._icon = icon;
+                    parent.appendChild(marker._icon);
+                }
+            }
             marker._initIcon();
             marker._initInteraction();
             marker.setOpacity(1);
@@ -806,7 +810,7 @@
             return !!this._drawing;
         },
 
-        reset: function () {},
+        reset: function () { },
 
         onFeatureAdd: function () {
             this.tools.editLayer.addLayer(this.editLayer);
@@ -1056,7 +1060,7 @@
             // 🍂section Vertex events
             // 🍂event editable:vertex:new: VertexEvent
             // Fired when a new vertex is created.
-            this.fireAndForward('editable:vertex:new', {latlng: vertex.latlng, vertex: vertex});
+            this.fireAndForward('editable:vertex:new', { latlng: vertex.latlng, vertex: vertex });
         },
 
         addVertexMarkers: function (latlngs) {
@@ -1333,12 +1337,12 @@
             // 🍂section Shape events
             // 🍂event editable:shape:new: ShapeEvent
             // Fired when a new shape is created in a multi (Polygon or Polyline).
-            this.fireAndForward('editable:shape:new', {shape: shape});
+            this.fireAndForward('editable:shape:new', { shape: shape });
             if (latlng) this.newPointForward(latlng);
         },
 
         deleteShape: function (shape, latlngs) {
-            var e = {shape: shape};
+            var e = { shape: shape };
             L.Editable.makeCancellable(e);
             // 🍂namespace Editable
             // 🍂section Shape events
@@ -1355,7 +1359,7 @@
             // 🍂section Shape events
             // 🍂event editable:shape:deleted: ShapeEvent
             // Fired after a new shape is deleted in a multi (Polygon or Polyline).
-            this.fireAndForward('editable:shape:deleted', {shape: shape});
+            this.fireAndForward('editable:shape:deleted', { shape: shape });
             return shape;
         },
 
@@ -1860,7 +1864,7 @@
                 l2 = latlngs[k];
 
                 if (((l1.lat > l.lat) !== (l2.lat > l.lat)) &&
-                        (l.lng < (l2.lng - l1.lng) * (l.lat - l1.lat) / (l2.lat - l1.lat) + l1.lng)) {
+                    (l.lng < (l2.lng - l1.lng) * (l.lat - l1.lat) / (l2.lat - l1.lat) + l1.lng)) {
                     inside = !inside;
                 }
             }
