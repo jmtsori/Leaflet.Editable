@@ -675,11 +675,13 @@
         },
 
         setVisibility: function () {
-            var leftPoint = this._map.latLngToContainerPoint(this.left.latlng),
-                rightPoint = this._map.latLngToContainerPoint(this.right.latlng),
-                size = L.point(this.options.icon.options.iconSize);
-            if (leftPoint.distanceTo(rightPoint) < size.x * 3) this.hide();
-            else this.show();
+            if (this._map) {
+                var leftPoint = this._map.latLngToContainerPoint(this.left.latlng),
+                    rightPoint = this._map.latLngToContainerPoint(this.right.latlng),
+                    size = L.point(this.options.icon.options.iconSize);
+                if (leftPoint.distanceTo(rightPoint) < size.x * 3) this.hide();
+                else this.show();
+            }
         },
 
         show: function () {
@@ -740,19 +742,23 @@
                     marker._icon = icon;
                     parent.appendChild(marker._icon);
                 }
+                marker._initIcon();
+                marker._initInteraction();
+                marker.setOpacity(1);
             }
-            marker._initIcon();
-            marker._initInteraction();
-            marker.setOpacity(1);
             /* End hack */
             // Transfer ongoing dragging to real marker
-            L.Draggable._dragging = false;
-            marker.dragging._draggable._onDown(e.originalEvent);
+            if (marker.dragging) {
+                L.Draggable._dragging = false;
+                marker.dragging._draggable._onDown(e.originalEvent);
+            }
             this.delete();
         },
 
         delete: function () {
-            this.editor.editLayer.removeLayer(this);
+            if (this.editor && this.editor.editLayer) {
+                this.editor.editLayer.removeLayer(this);
+            }
         },
 
         index: function () {
